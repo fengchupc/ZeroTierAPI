@@ -1,52 +1,44 @@
 import 'dart:convert';
-import 'dart:html' as html;
-import 'package:zerotierapi/services/storage_interface.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zerotierapi/models/device_model.dart';
 
-class WebStorageService implements StorageInterface {
-  static const String _tokenKey = 'zerotier_api_token';
-  static const String _cachePrefix = 'zerotier_cache_';
-  final html.Storage _localStorage = html.window.localStorage;
+class WebStorageService {
+  static const String _devicesKey = 'devices';
+  late SharedPreferences _prefs;
 
-  @override
   Future<void> initialize() async {
-    // Web storage doesn't need initialization
+    _prefs = await SharedPreferences.getInstance();
   }
 
-  @override
-  Future<String?> getApiToken() async {
-    return _localStorage[_tokenKey];
+  Future<void> saveDevices(List<Device> devices) async {
+    final devicesList = devices.map((device) => jsonEncode(device.toMap())).toList();
+    await _prefs.setStringList(_devicesKey, devicesList);
   }
 
-  @override
-  Future<void> setApiToken(String token) async {
-    _localStorage[_tokenKey] = token;
-  }
-
-  @override
-  Future<void> clearApiToken() async {
-    _localStorage.remove(_tokenKey);
-  }
-
-  @override
-  Future<Map<String, dynamic>?> getDeviceCache(String networkId) async {
-    final data = _localStorage['$_cachePrefix$networkId'];
-    if (data == null) return null;
-    return json.decode(data) as Map<String, dynamic>;
-  }
-
-  @override
-  Future<void> setDeviceCache(String networkId, Map<String, dynamic> data) async {
-    _localStorage['$_cachePrefix$networkId'] = json.encode(data);
-  }
-
-  @override
-  Future<void> clearCache() async {
-    final keysToRemove = _localStorage.keys
-        .where((key) => key.startsWith(_cachePrefix))
+  Future<List<Device>> getDevices() async {
+    final devicesList = _prefs.getStringList(_devicesKey) ?? [];
+    return devicesList
+        .map((deviceJson) => Device.fromMap(jsonDecode(deviceJson)))
         .toList();
-    
-    for (final key in keysToRemove) {
-      _localStorage.remove(key);
+  }
+
+  Future<void> clearDevices() async {
+    await _prefs.remove(_devicesKey);
+  }
+
+  Future<DateTime> getLastUpdateTime() async {
+    final devices = await getDevices();
+    if (devices.isEmpty) {
+      return DateTime(1970);
     }
+    
+    int? lastOnline = devices.first.lastOnline;
+    for (var device in devices) {
+      if (device.lastOnline != null && (lastOnline == null || device.lastOnline! > lastOnline)) {
+        lastOnline = device.lastOnline;
+      }
+    }
+    
+    return DateTime.fromMillisecondsSinceEpoch(lastOnline ?? 0);
   }
 } 

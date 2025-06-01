@@ -1,13 +1,11 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:path/path.dart';
 import 'package:zerotierapi/models/device_model.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:sqflite/sqflite.dart';
-import 'package:zerotierapi/services/storage_interface.dart';
 
-class DatabaseHelper implements StorageInterface {
+class DatabaseHelper {
   static const _databaseName = 'zerotier.db';
   static const _databaseVersion = 1;
   
@@ -18,21 +16,19 @@ class DatabaseHelper implements StorageInterface {
   static const columnIpAddress = 'ipAddress';
   static const columnOnline = 'online';
   
-  static final DatabaseHelper instance = DatabaseHelper._init();
-  static Database? _database;
-  static const String _tokenKey = 'zerotier_api_token';
-
-  DatabaseHelper._init();
+  DatabaseHelper._privateConstructor();
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   
+  static Database? _database;
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB(_databaseName);
+    _database = await _initDatabase();
     return _database!;
   }
   
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+  Future<Database> _initDatabase() async {
+    final appDir = await path_provider.getApplicationDocumentsDirectory();
+    final path = join(appDir.path, _databaseName);
     
     return await openDatabase(
       path,
@@ -58,21 +54,6 @@ class DatabaseHelper implements StorageInterface {
       CREATE INDEX idx_last_online 
       ON $table ($columnLastOnline)
     ''');
-
-    await db.execute('''
-      CREATE TABLE settings (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE device_cache (
-        networkId TEXT PRIMARY KEY,
-        data TEXT NOT NULL,
-        updatedAt INTEGER NOT NULL
-      )
-    ''');
   }
   
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -84,7 +65,6 @@ class DatabaseHelper implements StorageInterface {
     }
   }
   
-  @override
   Future<void> initialize() async {
     await database;
   }
@@ -144,73 +124,5 @@ class DatabaseHelper implements StorageInterface {
   Future<void> clearDevices() async {
     final db = await database;
     await db.delete(table);
-  }
-
-  @override
-  Future<String?> getApiToken() async {
-    final db = await database;
-    final result = await db.query(
-      'settings',
-      where: 'key = ?',
-      whereArgs: [_tokenKey],
-    );
-    return result.isNotEmpty ? result.first['value'] as String : null;
-  }
-
-  @override
-  Future<void> setApiToken(String token) async {
-    final db = await database;
-    await db.insert(
-      'settings',
-      {'key': _tokenKey, 'value': token},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  @override
-  Future<void> clearApiToken() async {
-    final db = await database;
-    await db.delete(
-      'settings',
-      where: 'key = ?',
-      whereArgs: [_tokenKey],
-    );
-  }
-
-  @override
-  Future<Map<String, dynamic>?> getDeviceCache(String networkId) async {
-    final db = await database;
-    final result = await db.query(
-      'device_cache',
-      where: 'networkId = ?',
-      whereArgs: [networkId],
-    );
-    if (result.isEmpty) return null;
-    return {'data': result.first['data']};
-  }
-
-  @override
-  Future<void> setDeviceCache(String networkId, Map<String, dynamic> data) async {
-    final db = await database;
-    await db.insert(
-      'device_cache',
-      {
-        'networkId': networkId,
-        'data': data.toString(),
-        'updatedAt': DateTime.now().millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  @override
-  Future<void> clearCache() async {
-    final db = await database;
-    await db.delete('device_cache');
-  }
-
-  Future<void> close() async {
-    final db = await instance.database;
-    db.close();
   }
 }

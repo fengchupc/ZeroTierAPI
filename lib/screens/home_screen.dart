@@ -1,9 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zerotierapi/models/device_model.dart';
-import 'package:zerotierapi/services/device_repository.dart';
-import 'package:zerotierapi/widgets/device_list_item.dart';
+import 'package:zerotierapi/services/zerotier_service.dart';
+import 'package:zerotierapi/services/storage_service.dart';
+import 'package:zerotierapi/widgets/device_card.dart';
+import 'package:zerotierapi/widgets/refresh_button.dart';
+import 'package:zerotierapi/utils/notifications.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,95 +15,124 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<List<Device>> _devicesFuture;
-  late final DeviceRepository _repository;
-  Timer? _refreshTimer;
+  Future<List<Device>>? _devicesFuture;
+  final ZeroTierService _service = ZeroTierService();
+  bool _isRefreshing = false;
 
   @override
   void initState() {
     super.initState();
-    _repository = context.read<DeviceRepository>();
     _loadDevices();
-    _startAutoRefresh();
+    _schedulePeriodicRefresh();
   }
 
-  @override
-  void dispose() {
-    _refreshTimer?.cancel();
-    super.dispose();
+  void _schedulePeriodicRefresh() {
+    Future.delayed(const Duration(minutes: 5), () {
+      if (mounted) {
+        _loadDevices();
+        _schedulePeriodicRefresh();
+      }
+    });
   }
 
   void _loadDevices() {
     setState(() {
-      _devicesFuture = _repository.getDevices();
+      _isRefreshing = true;
     });
-  }
 
-  void _startAutoRefresh() {
-    _refreshTimer = Timer.periodic(
-      const Duration(seconds: 30),
-      (_) => _loadDevices(),
-    );
+    final storage = context.read<StorageService>();
+    final apiToken = storage.apiToken;
+    final networkId = storage.networkId;
+
+    if (apiToken == null || networkId == null) {
+      setState(() {
+        _isRefreshing = false;
+        _devicesFuture = Future.value([]);
+      });
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.pushNamed(context, '/config');
+      });
+      return;
+    }
+
+    setState(() {
+      _devicesFuture = _service.getDevices(networkId, apiToken);
+      _devicesFuture?.then((_) {
+        if (!mounted) return;
+        setState(() => _isRefreshing = false);
+        showUpdateNotification(context, '设备列表已更新');
+      }).catchError((_) {
+        if (!mounted) return;
+        setState(() => _isRefreshing = false);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ZeroTier Devices'),
+        title: const Text('ZeroTier 设备状态'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.pushNamed(context, '/config'),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadDevices,
+          RefreshButton(
+            onRefresh: _loadDevices,
+            isRefreshing: _isRefreshing,
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          _loadDevices();
-        },
-        child: FutureBuilder<List<Device>>(
-          future: _devicesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            }
-
-            final devices = snapshot.data ?? [];
-            if (devices.isEmpty) {
-              return const Center(
-                child: Text('No devices found'),
-              );
-            }
-
-            return ListView.builder(
-              itemCount: devices.length,
-              itemBuilder: (context, index) {
-                final device = devices[index];
-                return DeviceListItem(
-                  device: device,
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/device',
-                      arguments: device,
-                    );
-                  },
-                );
-              },
+      body: FutureBuilder<List<Device>>(
+        future: _devicesFuture,
+        builder: (context, snapshot) {
+          if (_devicesFuture == null) {
+            return const Center(child: Text('请先配置 API Token 和 Network ID'));
+          }
+          
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('加载失败: ${snapshot.error}'),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _loadDevices,
+                    child: const Text('重试'),
+                  ),
+                ],
+              ),
             );
-          },
-        ),
+          }
+          
+          final devices = snapshot.data ?? [];
+          if (devices.isEmpty) {
+            return const Center(child: Text('未找到设备'));
+          }
+          
+          // 按最后在线时间排序
+          devices.sort((a, b) => 
+            (b.lastOnline ?? 0).compareTo(a.lastOnline ?? 0));
+          
+          return ListView.builder(
+            itemCount: devices.length,
+            itemBuilder: (context, index) {
+              return DeviceCard(device: devices[index]);
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _loadDevices,
+        child: const Icon(Icons.refresh),
       ),
     );
   }

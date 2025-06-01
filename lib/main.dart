@@ -10,27 +10,31 @@ import 'package:zerotierapi/screens/device_detail_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:zerotierapi/services/web_storage_service.dart';
 import 'package:zerotierapi/services/device_repository.dart';
-import 'package:zerotierapi/services/storage_interface.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 初始化存储服务
-  final StorageInterface storage = kIsWeb 
-      ? WebStorageService() as StorageInterface
-      : DatabaseHelper.instance as StorageInterface;
-  await storage.initialize();
-
-  // 初始化存储服务
+  // 初始化服务
   final storageService = StorageService();
   await storageService.initialize();
   
-  // 初始化API服务
-  final apiService = ZeroTierService(storageService);
+  final zerotierService = ZeroTierService();
   
-  // 初始化设备仓库
+  // 根据平台选择存储实现
+  final storage = kIsWeb 
+      ? await (() async {
+          final webStorage = WebStorageService();
+          await webStorage.initialize();
+          return webStorage;
+        })()
+      : await (() async {
+          final dbHelper = DatabaseHelper.instance;
+          await dbHelper.initialize();
+          return dbHelper;
+        })();
+  
   final deviceRepository = DeviceRepository(
-    apiService: apiService,
+    apiService: zerotierService,
     storage: storage,
   );
 
@@ -39,7 +43,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: storageService),
         Provider.value(value: storage),
-        Provider.value(value: apiService),
+        Provider.value(value: zerotierService),
         Provider.value(value: deviceRepository),
       ],
       child: const MyApp(),
@@ -60,13 +64,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) {
-          final storageService = context.read<StorageService>();
-          if (!storageService.isConfigured) {
-            return const ConfigScreen();
-          }
-          return const HomeScreen();
-        },
+        '/': (context) => const HomeScreen(),
         '/config': (context) => const ConfigScreen(),
         '/device': (context) {
           final device = ModalRoute.of(context)!.settings.arguments as Device;

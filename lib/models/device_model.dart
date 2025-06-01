@@ -6,12 +6,10 @@ class Device {
   final int? lastOnline;
   final String? ipAddress;
   final bool online;
-  final String networkId;
+  final String? networkId;
   final String? nodeId;
   final String? deviceId;
   final String? clientVersion;
-  final String? description;
-  final String? physicalAddress;
 
   Device({
     required this.id,
@@ -19,12 +17,10 @@ class Device {
     this.lastOnline,
     this.ipAddress,
     required this.online,
-    required this.networkId,
+    this.networkId,
     this.nodeId,
     this.deviceId,
     this.clientVersion,
-    this.description,
-    this.physicalAddress,
   });
 
   factory Device.fromJson(Map<String, dynamic> json) {
@@ -44,12 +40,10 @@ class Device {
           ? json['config']['ipAssignments'][0]
           : null,
       online: isOnline,
-      networkId: json['networkId'] as String,
+      networkId: json['networkId'],
       nodeId: json['nodeId'],
       deviceId: json['config']?['id'] as String?,
       clientVersion: json['clientVersion'] as String?,
-      description: json['description'] as String?,
-      physicalAddress: json['physicalAddress'] as String?,
     );
   }
 
@@ -64,19 +58,6 @@ class Device {
       'nodeId': nodeId,
       'deviceId': deviceId,
       'clientVersion': clientVersion,
-      'description': description,
-      'physicalAddress': physicalAddress,
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'networkId': networkId,
-      'name': name,
-      'online': online,
-      'lastOnline': lastOnline,
-      'description': description,
-      'physicalAddress': physicalAddress,
     };
   }
 
@@ -91,8 +72,6 @@ class Device {
       nodeId: map['nodeId'],
       deviceId: map['deviceId'],
       clientVersion: map['clientVersion'],
-      description: map['description'],
-      physicalAddress: map['physicalAddress'],
     );
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zerotierapi/services/storage_interface.dart';
 
-class StorageService extends ChangeNotifier implements StorageInterface {
+class StorageService with ChangeNotifier {
   static const String _apiTokenKey = 'zerotier_api_token';
   static const String _networkIdKey = 'zerotier_network_id';
   static const String _timeZoneKey = 'zerotier_time_zone';
@@ -10,65 +9,15 @@ class StorageService extends ChangeNotifier implements StorageInterface {
   String? _apiToken;
   String? _networkId;
   String? _timeZone;
-  SharedPreferences? _prefs;
-  bool _initialized = false;
   
   StorageService();
   
-  @override
   Future<void> initialize() async {
-    if (_initialized) return;
-    _prefs = await SharedPreferences.getInstance();
-    _apiToken = _prefs?.getString(_apiTokenKey);
-    _networkId = _prefs?.getString(_networkIdKey);
-    _timeZone = _prefs?.getString(_timeZoneKey);
-    _initialized = true;
+    final prefs = await SharedPreferences.getInstance();
+    _apiToken = prefs.getString(_apiTokenKey);
+    _networkId = prefs.getString(_networkIdKey);
+    _timeZone = prefs.getString(_timeZoneKey);
     notifyListeners();
-  }
-  
-  Future<SharedPreferences> get _preferences async {
-    if (!_initialized) {
-      await initialize();
-    }
-    return _prefs!;
-  }
-  
-  @override
-  Future<String?> getApiToken() async {
-    final prefs = await _preferences;
-    return prefs.getString(_apiTokenKey);
-  }
-  
-  @override
-  Future<void> setApiToken(String token) async {
-    final prefs = await _preferences;
-    await prefs.setString(_apiTokenKey, token);
-    _apiToken = token;
-    notifyListeners();
-  }
-  
-  @override
-  Future<void> clearApiToken() async {
-    final prefs = await _preferences;
-    await prefs.remove(_apiTokenKey);
-    _apiToken = null;
-    notifyListeners();
-  }
-  
-  @override
-  Future<Map<String, dynamic>?> getDeviceCache(String networkId) async {
-    // 实现设备缓存获取
-    return null;
-  }
-  
-  @override
-  Future<void> setDeviceCache(String networkId, Map<String, dynamic> data) async {
-    // 实现设备缓存存储
-  }
-  
-  @override
-  Future<void> clearCache() async {
-    // 实现缓存清理
   }
   
   String? get apiToken => _apiToken;
@@ -94,7 +43,7 @@ class StorageService extends ChangeNotifier implements StorageInterface {
   }
   
   Future<void> _saveString(String key, String? value) async {
-    final prefs = await _preferences;
+    final prefs = await SharedPreferences.getInstance();
     if (value != null) {
       await prefs.setString(key, value);
     } else {

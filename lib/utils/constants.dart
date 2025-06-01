@@ -5,7 +5,7 @@ class Constants {
   static const String apiBaseUrl = 'https://api.zerotier.com/api/v1';
   
   // 默认网络ID
-  static const String defaultNetworkId = '159924d630d01d64';
+  static const String defaultNetworkId = '000000000000000';
   
   // 默认超时时间（秒）
   static const int apiTimeout = 15;
