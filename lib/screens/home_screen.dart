@@ -75,7 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ZeroTier 设备状态'),
+        // 在 AppBar 的 actions 中添加
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () => Navigator.pushNamed(context, '/stats'),
+            tooltip: '设备统计',
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.pushNamed(context, '/config'),

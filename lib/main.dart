@@ -10,6 +10,7 @@ import 'package:zerotierapi/screens/device_detail_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:zerotierapi/services/web_storage_service.dart';
 import 'package:zerotierapi/services/device_repository.dart';
+import 'package:zerotierapi/screens/device_stats_screen.dart'; // 添加这一行导入语句
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: '/',
+      // 在 routes 中添加
       routes: {
         '/': (context) => const HomeScreen(),
         '/config': (context) => const ConfigScreen(),
@@ -70,6 +72,7 @@ class MyApp extends StatelessWidget {
           final device = ModalRoute.of(context)!.settings.arguments as Device;
           return DeviceDetailScreen(device: device);
         },
+        '/stats': (context) => const DeviceStatsScreen(), // 新增
       },
       debugShowCheckedModeBanner: false,
     );

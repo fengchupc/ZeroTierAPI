@@ -23,6 +23,7 @@ dependencies:
   path_provider: ^2.1.2
   shelf: ^1.4.1
   shelf_router: ^1.1.4
+  fl_chart: ^1.0.0  # 添加图表库
 
 dev_dependencies:
   flutter_test:
