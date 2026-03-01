@@ -58,20 +58,16 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build iOS app (release, no codesign)
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS IPA (release, no codesign)
+        run: flutter build ipa --release --no-codesign
 
-      - name: Package unsigned iOS IPA
+      - name: Verify widget extension exists in IPA
         run: |
-          mkdir -p dist
-          mkdir -p dist/Payload
-          cp -R build/ios/iphoneos/Runner.app dist/Payload/
-          cd dist
-          zip -r zerotierapi-ios-unsigned.ipa Payload
+          unzip -l build/ios/ipa/*.ipa | grep -E 'Payload/.+\.app/PlugIns/.+\.appex/'
 
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: zerotierapi-ios-unsigned-ipa
-          path: dist/zerotierapi-ios-unsigned.ipa
+          path: build/ios/ipa/*.ipa
           if-no-files-found: error
