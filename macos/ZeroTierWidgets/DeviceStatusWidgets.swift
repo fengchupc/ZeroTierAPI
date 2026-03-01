@@ -140,7 +140,7 @@ private struct DeviceStatusWidgetView: View {
       if entry.devices.isEmpty {
         Text("暂无设备")
           .font(.subheadline)
-          .foregroundStyle(.secondary)
+          .foregroundColor(.secondary)
       } else {
         ForEach(entry.devices, id: \.id) { device in
           Text(device.name ?? device.id)
@@ -153,7 +153,7 @@ private struct DeviceStatusWidgetView: View {
 
       Text("更新: \(entry.updatedAtText)")
         .font(.caption2)
-        .foregroundStyle(.secondary)
+        .foregroundColor(.secondary)
     }
     .padding()
   }
