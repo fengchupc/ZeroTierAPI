@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zerotierapi/models/device_model.dart';
-import 'package:zerotierapi/services/zerotier_service.dart';
+import 'package:zerotierapi/services/device_repository.dart';
 import 'package:zerotierapi/services/storage_service.dart';
 import 'package:zerotierapi/services/macos_widget_sync_service.dart';
 import 'package:zerotierapi/widgets/device_card.dart';
@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<Device>>? _devicesFuture;
-  final ZeroTierService _service = ZeroTierService();
   final MacOSWidgetSyncService _widgetSyncService = MacOSWidgetSyncService();
   bool _isRefreshing = false;
 
@@ -43,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     final storage = context.read<StorageService>();
+    final deviceRepo = context.read<DeviceRepository>();
     final apiToken = storage.apiToken;
     final networkId = storage.networkId;
 
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     setState(() {
-      _devicesFuture = _service.getDevices(networkId, apiToken);
+      _devicesFuture = deviceRepo.getDevices(networkId, apiToken);
       _devicesFuture?.then((devices) {
         _widgetSyncService.syncDevices(devices);
         if (!mounted) return;

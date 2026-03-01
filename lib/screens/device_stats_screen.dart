@@ -32,9 +32,16 @@ class _DeviceStatsScreenState extends State<DeviceStatsScreen> {
     try {
       final deviceRepo = Provider.of<DeviceRepository>(context, listen: false);
       final storage = Provider.of<StorageService>(context, listen: false);
+      final networkId = storage.networkId;
+      final apiToken = storage.apiToken;
+
+      if (networkId == null || networkId.isEmpty || apiToken == null || apiToken.isEmpty) {
+        throw Exception('请先在设置中配置 API Token 和 Network ID');
+      }
+
       final devices = await deviceRepo.getDevices(
-        storage.networkId!,
-        storage.apiToken!,
+        networkId,
+        apiToken,
       );
 
       if (!mounted) {
