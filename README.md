@@ -65,6 +65,7 @@ scripts\package_desktop.bat
   - `zerotierapi-windows`
   - `zerotierapi-macos`
   - `zerotierapi-linux`
+- 自动发布：工作流成功后会自动创建 GitHub Release，并附带上述产物
 
 ## Web 运行（可选）
 
