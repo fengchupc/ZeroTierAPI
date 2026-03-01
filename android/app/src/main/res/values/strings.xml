@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">zerotierapi</string>
+    <string name="widget_title_online">在线设备</string>
+    <string name="widget_title_offline">离线设备</string>
+    <string name="widget_title_all">全部设备</string>
+    <string name="widget_empty">暂无设备</string>
+    <string name="widget_updated_prefix">更新: %1$s</string>
+    <string name="widget_updated_unknown">更新: 未知</string>
+    <string name="widget_name_online">在线设备</string>
+    <string name="widget_name_offline">离线设备</string>
+    <string name="widget_name_all">全部设备</string>
+</resources>

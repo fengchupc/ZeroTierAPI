@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zerotierapi/models/device_model.dart';
 import 'package:zerotierapi/services/device_repository.dart';
 import 'package:zerotierapi/services/storage_service.dart';
-import 'package:zerotierapi/services/macos_widget_sync_service.dart';
+import 'package:zerotierapi/services/widget_sync_service.dart';
 import 'package:zerotierapi/widgets/device_card.dart';
 import 'package:zerotierapi/widgets/refresh_button.dart';
 import 'package:zerotierapi/utils/notifications.dart';
@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<Device>>? _devicesFuture;
-  final MacOSWidgetSyncService _widgetSyncService = MacOSWidgetSyncService();
+  final WidgetSyncService _widgetSyncService = WidgetSyncService();
   bool _isRefreshing = false;
 
   @override
