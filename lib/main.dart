@@ -7,13 +7,23 @@ import 'package:zerotierapi/services/database_helper.dart';
 import 'package:zerotierapi/services/zerotier_service.dart';
 import 'package:zerotierapi/models/device_model.dart';
 import 'package:zerotierapi/screens/device_detail_screen.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+  show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:zerotierapi/services/web_storage_service.dart';
 import 'package:zerotierapi/services/device_repository.dart';
 import 'package:zerotierapi/screens/device_stats_screen.dart'; // 添加这一行导入语句
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.linux ||
+          defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.macOS)) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
   // 初始化服务
   final storageService = StorageService();
@@ -62,6 +72,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'NotoSans',
+        fontFamilyFallback: const ['DroidSansFallback'],
       ),
       initialRoute: '/',
       // 在 routes 中添加

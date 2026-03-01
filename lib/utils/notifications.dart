@@ -12,7 +12,9 @@ Future<void> initNotifications() async {
     android: initializationSettingsAndroid,
   );
   
-  await notificationsPlugin.initialize(initializationSettings);
+  await notificationsPlugin.initialize(
+    settings: initializationSettings,
+  );
 }
 
 Future<void> showUpdateNotification(BuildContext context, String message) async {
@@ -30,9 +32,9 @@ Future<void> showUpdateNotification(BuildContext context, String message) async 
       NotificationDetails(android: androidPlatformChannelSpecifics);
   
   await notificationsPlugin.show(
-    0,
-    'ZeroTier 状态更新',
-    message,
-    platformChannelSpecifics,
+    id: 0,
+    title: 'ZeroTier 状态更新',
+    body: message,
+    notificationDetails: platformChannelSpecifics,
   );
 }

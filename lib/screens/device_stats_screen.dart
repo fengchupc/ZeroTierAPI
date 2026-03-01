@@ -37,11 +37,19 @@ class _DeviceStatsScreenState extends State<DeviceStatsScreen> {
         storage.apiToken!,
       );
 
+      if (!mounted) {
+        return;
+      }
+
       setState(() {
         _devices = devices;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
       setState(() {
         _isLoading = false;
       });
