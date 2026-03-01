@@ -53,6 +53,19 @@ scripts\package_desktop.bat
 产物：`dist/zerotierapi-macos.zip`  
 解压后双击 `zerotierapi.app` 即可运行。
 
+## GitHub Actions 自动打包（Win/macOS/Linux）
+
+仓库已提供工作流：`.github/workflows/desktop-build.yml`
+
+- 触发方式：
+  - push 到 `main`
+  - 手动触发（Actions -> Build Desktop Packages -> Run workflow）
+- 构建平台：Windows / macOS / Linux
+- 产物：在每次工作流运行的 Artifacts 中下载
+  - `zerotierapi-windows`
+  - `zerotierapi-macos`
+  - `zerotierapi-linux`
+
 ## Web 运行（可选）
 
 推荐使用一键脚本：
