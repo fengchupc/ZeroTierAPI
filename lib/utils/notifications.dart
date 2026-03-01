@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 final FlutterLocalNotificationsPlugin notificationsPlugin =
     FlutterLocalNotificationsPlugin();
+Future<void>? _notificationsInitFuture;
 
 Future<void> initNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
@@ -23,7 +24,13 @@ Future<void> initNotifications() async {
   );
 }
 
+Future<void> ensureNotificationsInitialized() {
+  return _notificationsInitFuture ??= initNotifications();
+}
+
 Future<void> showUpdateNotification(BuildContext context, String message) async {
+  await ensureNotificationsInitialized();
+
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'zerotier_channel',

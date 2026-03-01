@@ -13,6 +13,7 @@ import 'package:zerotierapi/services/web_storage_service.dart';
 import 'package:zerotierapi/services/device_repository.dart';
 import 'package:zerotierapi/screens/device_stats_screen.dart'; // 添加这一行导入语句
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:zerotierapi/utils/notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,10 @@ void main() async {
           defaultTargetPlatform == TargetPlatform.macOS)) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+  }
+
+  if (!kIsWeb) {
+    await ensureNotificationsInitialized();
   }
 
   // 初始化服务
