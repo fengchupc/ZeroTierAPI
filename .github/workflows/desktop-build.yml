@@ -24,7 +24,7 @@ jobs:
           - target: windows
             os: windows-latest
             artifact_name: zerotierapi-windows
-            artifact_path: dist/zerotierapi-windows-x64.zip
+            artifact_path: dist/zerotierapi-windows-*.zip
           - target: macos
             os: macos-latest
             artifact_name: zerotierapi-macos

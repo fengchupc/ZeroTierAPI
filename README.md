@@ -41,7 +41,7 @@ flutter run -d linux
 scripts\package_desktop.bat
 ```
 
-产物：`dist\zerotierapi-windows-x64.zip`  
+产物：`dist\zerotierapi-windows-<arch>.zip`（支持 `x86` / `x64` / `arm` / `arm64`）  
 解压后双击 `zerotierapi.exe` 即可运行。
 
 ### macOS（在 macOS 机器上执行）
