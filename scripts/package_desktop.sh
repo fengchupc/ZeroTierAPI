@@ -22,16 +22,20 @@ flutter pub get
 echo "[2/3] 构建 Linux release..."
 flutter build linux
 
-ARCH="$(uname -m)"
-BUNDLE_DIR="build/linux/${ARCH}/release/bundle"
-if [[ ! -d "$BUNDLE_DIR" ]]; then
-  BUNDLE_DIR="build/linux/arm64/release/bundle"
-fi
+BUNDLE_DIR=""
+for candidate in build/linux/*/release/bundle; do
+  if [[ -d "$candidate" ]]; then
+    BUNDLE_DIR="$candidate"
+    break
+  fi
+done
 
 if [[ ! -d "$BUNDLE_DIR" ]]; then
   echo "[ERROR] 找不到 Linux bundle 目录，构建可能失败。"
   exit 1
 fi
+
+ARCH="$(basename "$(dirname "$(dirname "$BUNDLE_DIR")")")"
 
 mkdir -p dist
 PKG_NAME="zerotierapi-linux-${ARCH}.tar.gz"
