@@ -58,16 +58,38 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build iOS IPA (release, no codesign)
-        run: flutter build ipa --release --no-codesign
+      - name: Build iOS app (release, no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Archive iOS app without signing
+        run: |
+          xcodebuild archive \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Verify widget extension exists in archive
+        run: |
+          ls -la build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/PlugIns
+          test -d build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/PlugIns/ZeroTierWidgets.appex
+
+      - name: Package unsigned iOS IPA from archive
+        run: |
+          mkdir -p build/ios/ipa/Payload
+          cp -R build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/ipa/Payload/
+          cd build/ios/ipa
+          zip -r zerotierapi-ios-unsigned.ipa Payload
 
       - name: Verify widget extension exists in IPA
         run: |
-          unzip -l build/ios/ipa/*.ipa | grep -E 'Payload/.+\.app/PlugIns/.+\.appex/'
+          unzip -l build/ios/ipa/zerotierapi-ios-unsigned.ipa | grep -E 'Payload/.+\.app/PlugIns/.+\.appex/'
 
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: zerotierapi-ios-unsigned-ipa
-          path: build/ios/ipa/*.ipa
+          path: build/ios/ipa/zerotierapi-ios-unsigned.ipa
           if-no-files-found: error
