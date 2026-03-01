@@ -1,11 +1,11 @@
 # ZeroTierAPI (Flutter)
 
-基于 Flutter 的 ZeroTier 设备状态查看应用。当前建议优先走桌面端（Windows / macOS / Linux）发布。
+基于 Flutter 的 ZeroTier 设备状态查看应用。支持桌面端与移动端打包。
 
 ## 当前策略
 
-- 桌面端优先：先做到“打包后双击直接运行”。
-- 移动端后续：Android / iOS 暂不作为当前交付目标。
+- 桌面端：Windows / macOS / Linux 可一键打包。
+- 移动端：Android 支持直接产出 APK；iOS 支持产出未签名包用于后续自签。
 - Web 仍可用，但 Web 模式通常需要本地代理处理 CORS。
 - 内置双字体：Noto Sans（英文主字体，约 608KB）+ Droid Sans Fallback（中文兜底，约 3.9MB），避免中英文任一方块乱码。
 
@@ -66,6 +66,22 @@ scripts\package_desktop.bat
   - `zerotierapi-macos`
   - `zerotierapi-linux`
 - 自动发布：工作流成功后会自动创建 GitHub Release，并附带上述产物
+
+## GitHub Actions 自动打包（Android/iOS）
+
+仓库已提供工作流：`.github/workflows/mobile-build.yml`
+
+- 触发方式：
+  - push 到 `main`
+  - 手动触发（Actions -> Build Mobile Packages -> Run workflow）
+- Android 产物：
+  - Artifact 名称：`zerotierapi-android-apk`
+  - 文件：`build/app/outputs/flutter-apk/app-release.apk`
+- iOS 产物（未签名）：
+  - Artifact 名称：`zerotierapi-ios-unsigned-app`
+  - 文件：`dist/zerotierapi-ios-unsigned-app.zip`（内含 `Runner.app`）
+
+> iOS 构建使用 `flutter build ios --release --no-codesign`，需你后续在本地进行自签后再安装运行。
 
 ## Web 运行（可选）
 
