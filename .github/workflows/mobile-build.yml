@@ -40,7 +40,7 @@ jobs:
           if-no-files-found: error
 
   ios:
-    name: build-ios-unsigned
+    name: build-ios-ipa-unsigned
     runs-on: macos-latest
 
     steps:
@@ -61,16 +61,17 @@ jobs:
       - name: Build iOS app (release, no codesign)
         run: flutter build ios --release --no-codesign
 
-      - name: Package unsigned iOS app
+      - name: Package unsigned iOS IPA
         run: |
           mkdir -p dist
-          ditto -c -k --sequesterRsrc --keepParent \
-            build/ios/iphoneos/Runner.app \
-            dist/zerotierapi-ios-unsigned-app.zip
+          mkdir -p dist/Payload
+          cp -R build/ios/iphoneos/Runner.app dist/Payload/
+          cd dist
+          zip -r zerotierapi-ios-unsigned.ipa Payload
 
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: zerotierapi-ios-unsigned-app
-          path: dist/zerotierapi-ios-unsigned-app.zip
+          name: zerotierapi-ios-unsigned-ipa
+          path: dist/zerotierapi-ios-unsigned.ipa
           if-no-files-found: error

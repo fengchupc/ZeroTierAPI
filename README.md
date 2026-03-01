@@ -78,10 +78,10 @@ scripts\package_desktop.bat
   - Artifact 名称：`zerotierapi-android-apk`
   - 文件：`build/app/outputs/flutter-apk/app-release.apk`
 - iOS 产物（未签名）：
-  - Artifact 名称：`zerotierapi-ios-unsigned-app`
-  - 文件：`dist/zerotierapi-ios-unsigned-app.zip`（内含 `Runner.app`）
+  - Artifact 名称：`zerotierapi-ios-unsigned-ipa`
+  - 文件：`dist/zerotierapi-ios-unsigned.ipa`
 
-> iOS 构建使用 `flutter build ios --release --no-codesign`，需你后续在本地进行自签后再安装运行。
+> iOS 构建先用 `flutter build ios --release --no-codesign` 产出 `Runner.app`，再在 CI 中打包为未签名 `.ipa`，需你后续在本地进行自签后再安装运行。
 
 ## Web 运行（可选）
 
