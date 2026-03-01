@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'zerotier.db';
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
   
   static const table = 'devices';
   static const columnId = 'id';
@@ -43,7 +43,11 @@ class DatabaseHelper {
         $columnName TEXT,
         $columnLastOnline INTEGER,
         $columnIpAddress TEXT,
-        $columnOnline INTEGER
+        $columnOnline INTEGER,
+        networkId TEXT,
+        nodeId TEXT,
+        deviceId TEXT,
+        clientVersion TEXT
       )
     ''');
     
@@ -56,10 +60,18 @@ class DatabaseHelper {
   
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('''
-        ALTER TABLE $table 
-        ADD COLUMN last_seen INTEGER DEFAULT 0
-      ''');
+      await _addColumnIfNotExists(db, 'networkId', 'TEXT');
+      await _addColumnIfNotExists(db, 'nodeId', 'TEXT');
+      await _addColumnIfNotExists(db, 'deviceId', 'TEXT');
+      await _addColumnIfNotExists(db, 'clientVersion', 'TEXT');
+    }
+  }
+
+  Future<void> _addColumnIfNotExists(Database db, String columnName, String columnType) async {
+    final columns = await db.rawQuery('PRAGMA table_info($table)');
+    final exists = columns.any((column) => column['name'] == columnName);
+    if (!exists) {
+      await db.execute('ALTER TABLE $table ADD COLUMN $columnName $columnType');
     }
   }
   
