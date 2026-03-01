@@ -94,3 +94,29 @@ PROXY_PORT=3001 WEB_PORT=8081 ./scripts/run_web_with_proxy.sh
 
 首次启动后，在配置页面填写 ZeroTier API Token 与 Network ID，应用会加密保存在本地并在下次启动自动回填。
 
+## macOS 桌面 Widget（在线 / 离线 / 全部）
+
+已提供 WidgetKit 源码（目录：`macos/ZeroTierWidgets`），包含 3 个 widget：
+
+- 在线设备
+- 离线设备
+- 全部设备
+
+### 工程接入状态
+
+Widget Extension target 已经直接接入工程（`macos/Runner.xcodeproj/project.pbxproj`），包含：
+
+- `ZeroTierWidgets` target
+- `Embed App Extensions`（Runner 自动内嵌 `ZeroTierWidgets.appex`）
+- Widget 的 `Info.plist` / Entitlements / Build Settings
+- Runner 与 Widget 共享 App Group：`group.com.example.zerotierapi.widgets`
+
+你只需要在 macOS 打开 `macos/Runner.xcworkspace` 后确认签名（Signing）与 Team 配置即可。
+
+### 数据更新机制
+
+- App 每次刷新设备列表后，会通过原生通道同步设备快照到 `UserDefaults(App Group)`
+- 同步成功后自动触发 `WidgetCenter.reloadAllTimelines()` 刷新桌面 widget
+
+> 如果你修改了 `PRODUCT_BUNDLE_IDENTIFIER`，请同步更新 App Group 命名和相关常量。
+
