@@ -1,13 +1,15 @@
 name: zerotierapi
-description: A ZeroTier device status Flutter app.
+description: A ZeroTier One device status Flutter app.
 publish_to: "none"
-version: 2.0.1+1
+version: 2.1.0+1
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
   http: ^1.6.0
   provider: ^6.0.5
@@ -25,6 +27,7 @@ dependencies:
   shelf: ^1.4.1
   shelf_router: ^1.1.4
   fl_chart: ^1.0.0  # 添加图表库
+  package_info_plus: ^8.1.2
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +35,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
   fonts:
     - family: NotoSans

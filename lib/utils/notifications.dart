@@ -18,7 +18,7 @@ Future<void> initNotifications() async {
 
   const WindowsInitializationSettings initializationSettingsWindows =
       WindowsInitializationSettings(
-        appName: 'ZeroTierAPI',
+        appName: 'ZeroTier One Management',
         appUserModelId: 'com.example.zerotierapi',
         guid: '8f7de4dd-f7c7-4ac8-b598-9b9f6ca85ca8',
       );
@@ -50,8 +50,8 @@ Future<void> showUpdateNotification(BuildContext context, String message) async 
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'zerotier_channel',
-    'ZeroTier Updates',
-    channelDescription: 'ZeroTier device status updates',
+    'ZeroTier One Updates',
+    channelDescription: 'ZeroTier One device status updates',
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     showWhen: false,
@@ -79,7 +79,7 @@ Future<void> showUpdateNotification(BuildContext context, String message) async 
 
   await notificationsPlugin.show(
     id: 0,
-    title: 'ZeroTier 状态更新',
+    title: 'ZeroTier One 状态更新',
     body: body,
     notificationDetails: platformChannelSpecifics,
   );

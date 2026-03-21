@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zerotierapi/l10n/app_localizations.dart';
 import 'package:zerotierapi/models/device_model.dart';
 import 'package:zerotierapi/utils/time_utils.dart';
 import 'package:zerotierapi/widgets/status_indicator.dart';
@@ -11,6 +12,8 @@ class DeviceCard extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
@@ -20,7 +23,7 @@ class DeviceCard extends StatelessWidget {
       child: ListTile(
         leading: StatusIndicator(isOnline: device.online),
         title: Text(
-          device.name ?? '未命名设备',
+          device.name ?? l10n.unnamedDevice,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -32,11 +35,11 @@ class DeviceCard extends StatelessWidget {
           children: [
             if (device.ipAddress != null)
               Text(
-                'IP: ${device.ipAddress}',
+                l10n.ipLabel(device.ipAddress!),
                 style: const TextStyle(fontSize: 12),
               ),
             Text(
-              device.online ? '在线' : '离线',
+              device.online ? l10n.online : l10n.offline,
               style: TextStyle(
                 color: device.online ? Colors.green : Colors.orange,
                 fontWeight: FontWeight.w500,
@@ -49,11 +52,11 @@ class DeviceCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              formatLastOnline(device.lastOnline),
+              formatLastOnline(device.lastOnline, l10n),
               style: const TextStyle(fontSize: 12),
             ),
             Text(
-              timeAgo(device.lastOnline),
+              timeAgo(device.lastOnline, l10n),
               style: TextStyle(
                 fontSize: 11,
                 color: device.online ? Colors.green : Colors.grey,

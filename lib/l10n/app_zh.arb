@@ -1,0 +1,221 @@
+{
+  "@@locale": "zh",
+  "appTitle": "ZeroTier One 管理",
+  "homeTitle": "ZeroTier One 设备状态",
+  "stats": "设备统计",
+  "advancedAdmin": "高级管理",
+  "config": "配置",
+  "refresh": "刷新",
+  "retry": "重试",
+  "notFoundDevices": "未找到设备",
+  "loadFailed": "加载失败: {error}",
+  "@loadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "configNeeded": "请先配置 API Token 和 Network ID",
+  "unnamedDevice": "未命名设备",
+  "online": "在线",
+  "offline": "离线",
+  "ipLabel": "IP: {ip}",
+  "@ipLabel": {
+    "placeholders": {
+      "ip": {}
+    }
+  },
+  "configTitle": "配置",
+  "apiToken": "API Token",
+  "apiTokenHint": "从 ZeroTier One 控制台获取",
+  "showToken": "显示 Token",
+  "hideToken": "隐藏 Token",
+  "copyToken": "复制 Token",
+  "tokenCopied": "Token 已复制到剪贴板",
+  "networkId": "网络ID",
+  "networkIdHint": "例如: 0000000000000000",
+  "timeZone": "时区",
+  "timeZoneHint": "例如: Asia/Shanghai, America/New_York",
+  "language": "语言",
+  "saveConfig": "保存配置",
+  "configSaved": "配置已保存",
+  "configHelp": "配置说明:",
+  "configHelp1": "1. 登录 ZeroTier One Central (https://my.zerotier.com)",
+  "configHelp2": "2. 在 Networks 页面找到您的网络ID",
+  "configHelp3": "3. 在 Settings > API 生成 API Token",
+  "version": "版本: {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "languageChinese": "中文",
+  "languageEnglish": "English",
+  "deviceDetail": "设备详情",
+  "loadDeviceDetailFailed": "加载设备详情失败: {error}",
+  "@loadDeviceDetailFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "basicInfo": "基本信息",
+  "memberId": "成员ID",
+  "deviceName": "设备名称",
+  "description": "描述",
+  "status": "状态",
+  "lastOnlineTime": "最后在线时间",
+  "lastOnline": "最后在线",
+  "networkInfo": "网络信息",
+  "ipAddress": "IP地址",
+  "publicIp": "公网IP",
+  "ipAssignments": "IP Assignments",
+  "unassigned": "未分配",
+  "authorized": "已授权",
+  "yes": "是",
+  "no": "否",
+  "managementSwitches": "管理开关",
+  "hiddenMember": "隐藏成员",
+  "disableAutoAssignIp": "禁止自动分配 IP",
+  "activeBridge": "活动桥接",
+  "ssoExempt": "SSO 豁免",
+  "technicalInfo": "技术信息",
+  "nodeId": "节点ID",
+  "deviceId": "设备ID",
+  "clientVersion": "客户端版本",
+  "unknown": "未知",
+  "memberActions": "成员操作",
+  "editMember": "编辑成员",
+  "deleteMember": "删除成员",
+  "missingTokenOrNetwork": "缺少 API Token 或 Network ID 配置",
+  "updateSuccess": "成员信息已更新",
+  "updateFailed": "更新失败",
+  "deleteSuccess": "成员已删除",
+  "deleteFailed": "删除失败",
+  "copyError": "复制错误",
+  "errorCopied": "错误信息已复制",
+  "neverOnline": "从未在线",
+  "justNowOnline": "刚刚在线",
+  "minutesAgo": "{count}分钟前",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "hoursAgo": "{count}小时前",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "daysAgo": "{count}天前",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cancel": "取消",
+  "save": "保存",
+  "close": "关闭",
+  "name": "名称",
+  "memberEditTitle": "编辑成员",
+  "ipAssignmentsHint": "多个 IP 用逗号分隔",
+  "deleteMemberTitle": "删除成员",
+  "deleteMemberWarning": "该成员会从当前网络中删除。",
+  "confirmDeleteMember": "请输入成员 ID 以确认: {id}",
+  "@confirmDeleteMember": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "confirmMemberId": "确认成员 ID",
+  "adminTitle": "ZeroTier One 管理",
+  "adminLoadFailed": "加载管理信息失败: {error}",
+  "@adminLoadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "noAdminData": "没有可用的管理数据",
+  "centralStatus": "Central 状态",
+  "centralVersion": "Central 版本",
+  "apiVersion": "API 版本",
+  "readOnlyMode": "只读模式",
+  "currentNetwork": "当前网络",
+  "networkNotConfigured": "当前未配置 Network ID，或该网络无法访问。",
+  "networkName": "名称",
+  "privateNetwork": "私有网络",
+  "defaultValue": "默认",
+  "broadcast": "广播",
+  "enabled": "已启用",
+  "disabled": "未启用",
+  "editNetwork": "编辑网络",
+  "createNetwork": "新建网络",
+  "accessibleNetworks": "可访问网络",
+  "noAccessibleNetworks": "当前账号下没有可访问网络",
+  "noDescription": "无描述",
+  "current": "当前",
+  "setCurrent": "设为当前",
+  "switchedCurrentNetwork": "当前网络已切换为 {id}",
+  "@switchedCurrentNetwork": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "currentUser": "当前用户",
+  "cannotFetchCurrentUser": "无法获取当前用户信息",
+  "userId": "用户 ID",
+  "displayName": "显示名称",
+  "email": "邮箱",
+  "orgId": "组织 ID",
+  "smsNumber": "短信号码",
+  "none": "无",
+  "unset": "未设置",
+  "editUser": "编辑用户",
+  "deleteUser": "删除用户",
+  "apiTokenManagement": "API Token 管理",
+  "noVisibleApiToken": "当前用户还没有可见的 API Token 记录",
+  "deleteToken": "删除 Token",
+  "addApiToken": "添加 API Token",
+  "networkNameLabel": "网络名称",
+  "rulesSource": "Rules Source",
+  "allowBroadcast": "允许广播",
+  "setCurrentAfterCreate": "创建后设为当前网络",
+  "create": "创建",
+  "networkCreated": "网络已创建: {id}",
+  "@networkCreated": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "userUpdated": "用户信息已更新",
+  "deleteUserTitle": "删除用户",
+  "deleteUserWarning": "该操作会删除用户及其关联网络，无法撤销。",
+  "confirmDeleteUser": "请输入用户 ID 以确认删除: {id}",
+  "@confirmDeleteUser": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "confirmUserId": "确认用户 ID",
+  "deleteUserButton": "删除用户",
+  "userDeleted": "用户已删除",
+  "tokenName": "Token 名称",
+  "tokenValue": "Token 值",
+  "generateRandomToken": "生成随机 Token",
+  "add": "添加",
+  "tokenNameValueRequired": "Token 名称和 Token 值都不能为空",
+  "apiTokenAdded": "API Token 已添加",
+  "deleteApiTokenTitle": "删除 API Token",
+  "confirmDeleteToken": "确认删除 Token: {name} ?",
+  "@confirmDeleteToken": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "delete": "删除",
+  "tokenDeleted": "Token {name} 已删除",
+  "@tokenDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  }
+}

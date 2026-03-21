@@ -1,6 +1,6 @@
 {
-    "name": "zerotierapi",
-    "short_name": "zerotierapi",
+    "name": "ZeroTier One Management",
+    "short_name": "ZeroTier One",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

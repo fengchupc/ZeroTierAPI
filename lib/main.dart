@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:zerotierapi/services/storage_service.dart';
 import 'package:zerotierapi/screens/home_screen.dart';
@@ -15,6 +16,7 @@ import 'package:zerotierapi/screens/device_stats_screen.dart'; // 添加这一�
 import 'package:zerotierapi/screens/admin_screen.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:zerotierapi/utils/notifications.dart';
+import 'package:zerotierapi/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,16 +73,28 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  Locale? _resolveLocale(String? languageCode) {
+    if (languageCode == null || languageCode.isEmpty) {
+      return null;
+    }
+    return Locale(languageCode);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final storage = context.watch<StorageService>();
+
     return MaterialApp(
-      title: 'ZeroTier Status',
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'NotoSans',
         fontFamilyFallback: const ['DroidSansFallback'],
       ),
+      locale: _resolveLocale(storage.languageCode),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       initialRoute: '/',
       // 在 routes 中添加
       routes: {

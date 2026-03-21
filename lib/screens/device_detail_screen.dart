@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zerotierapi/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:zerotierapi/models/device_model.dart';
 import 'package:zerotierapi/services/storage_service.dart';
@@ -47,14 +48,16 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.device.name ?? '设备详情'),
+        title: Text(widget.device.name ?? l10n.deviceDetail),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadMember,
-            tooltip: '刷新',
+            tooltip: l10n.refresh,
           ),
         ],
       ),
@@ -66,7 +69,9 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('加载设备详情失败: ${snapshot.error}'));
+            return Center(
+              child: Text(l10n.loadDeviceDetailFailed(snapshot.error.toString())),
+            );
           }
 
           final device = snapshot.data ?? widget.device;
@@ -75,48 +80,48 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoCard('基本信息', [
-                  _buildInfoRow('成员ID', device.id),
-                  if (device.name != null) _buildInfoRow('设备名称', device.name!),
+                _buildInfoCard(l10n.basicInfo, [
+                  _buildInfoRow(l10n.memberId, device.id),
+                  if (device.name != null) _buildInfoRow(l10n.deviceName, device.name!),
                   if (device.description != null)
-                    _buildInfoRow('描述', device.description!),
-                  _buildInfoRow('状态', device.online ? '在线' : '离线'),
-                  _buildInfoRow('最后在线时间', formatLastOnline(device.lastOnline)),
-                  _buildInfoRow('最后在线', timeAgo(device.lastOnline)),
+                    _buildInfoRow(l10n.description, device.description!),
+                  _buildInfoRow(l10n.status, device.online ? l10n.online : l10n.offline),
+                  _buildInfoRow(l10n.lastOnlineTime, formatLastOnline(device.lastOnline, l10n)),
+                  _buildInfoRow(l10n.lastOnline, timeAgo(device.lastOnline, l10n)),
                 ]),
-                _buildInfoCard('网络信息', [
-                  _buildInfoRow('IP地址', device.ipAddress ?? '未分配'),
+                _buildInfoCard(l10n.networkInfo, [
+                  _buildInfoRow(l10n.ipAddress, device.ipAddress ?? l10n.unassigned),
                   _buildInfoRow(
-                    '公网IP',
-                    _extractPublicIp(device.physicalAddress) ?? '未知',
+                    l10n.publicIp,
+                    _extractPublicIp(device.physicalAddress) ?? l10n.unknown,
                   ),
                   _buildInfoRow(
-                    'IP Assignments',
+                    l10n.ipAssignments,
                     device.ipAssignments.isEmpty
-                        ? '未分配'
+                        ? l10n.unassigned
                         : device.ipAssignments.join(', '),
                   ),
                   _buildInfoRow(
-                    '网络ID',
+                    l10n.networkId,
                     device.networkId ?? Constants.defaultNetworkId,
                   ),
-                  _buildInfoRow('已授权', device.authorized == true ? '是' : '否'),
+                  _buildInfoRow(l10n.authorized, device.authorized == true ? l10n.yes : l10n.no),
                 ]),
-                _buildInfoCard('管理开关', [
-                  _buildInfoRow('隐藏成员', device.hidden ? '是' : '否'),
+                _buildInfoCard(l10n.managementSwitches, [
+                  _buildInfoRow(l10n.hiddenMember, device.hidden ? l10n.yes : l10n.no),
                   _buildInfoRow(
-                    '禁止自动分配 IP',
-                    device.noAutoAssignIps ? '是' : '否',
+                    l10n.disableAutoAssignIp,
+                    device.noAutoAssignIps ? l10n.yes : l10n.no,
                   ),
-                  _buildInfoRow('活动桥接', device.activeBridge ? '是' : '否'),
-                  _buildInfoRow('SSO 豁免', device.ssoExempt ? '是' : '否'),
+                  _buildInfoRow(l10n.activeBridge, device.activeBridge ? l10n.yes : l10n.no),
+                  _buildInfoRow(l10n.ssoExempt, device.ssoExempt ? l10n.yes : l10n.no),
                 ]),
-                _buildInfoCard('技术信息', [
-                  _buildInfoRow('节点ID', device.nodeId ?? '未知'),
-                  _buildInfoRow('设备ID', device.deviceId ?? '未知'),
-                  _buildInfoRow('客户端版本', device.clientVersion ?? '未知'),
+                _buildInfoCard(l10n.technicalInfo, [
+                  _buildInfoRow(l10n.nodeId, device.nodeId ?? l10n.unknown),
+                  _buildInfoRow(l10n.deviceId, device.deviceId ?? l10n.unknown),
+                  _buildInfoRow(l10n.clientVersion, device.clientVersion ?? l10n.unknown),
                 ]),
-                _buildInfoCard('成员操作', [
+                _buildInfoCard(l10n.memberActions, [
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,
@@ -124,12 +129,12 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                       ElevatedButton.icon(
                         onPressed: () => _showEditDialog(device),
                         icon: const Icon(Icons.edit),
-                        label: const Text('编辑成员'),
+                        label: Text(l10n.editMember),
                       ),
                       OutlinedButton.icon(
                         onPressed: () => _showDeleteDialog(device),
                         icon: const Icon(Icons.delete_outline),
-                        label: const Text('删除成员'),
+                        label: Text(l10n.deleteMember),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Theme.of(context).colorScheme.error,
                         ),
@@ -146,6 +151,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   }
 
   Future<void> _showEditDialog(Device device) async {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: device.name ?? '');
     final descriptionController = TextEditingController(
       text: device.description ?? '',
@@ -165,34 +171,34 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('编辑成员'),
+              title: Text(l10n.memberEditTitle),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: '名称'),
+                      decoration: InputDecoration(labelText: l10n.name),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: descriptionController,
-                      decoration: const InputDecoration(labelText: '描述'),
+                      decoration: InputDecoration(labelText: l10n.description),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: ipAssignmentsController,
-                      decoration: const InputDecoration(
-                        labelText: 'IP Assignments',
-                        hintText: '多个 IP 用逗号分隔',
+                      decoration: InputDecoration(
+                        labelText: l10n.ipAssignments,
+                        hintText: l10n.ipAssignmentsHint,
                       ),
                       maxLines: 2,
                     ),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: authorized,
-                      title: const Text('已授权'),
+                      title: Text(l10n.authorized),
                       onChanged: (value) {
                         setState(() {
                           authorized = value;
@@ -202,7 +208,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: hidden,
-                      title: const Text('隐藏成员'),
+                      title: Text(l10n.hiddenMember),
                       onChanged: (value) {
                         setState(() {
                           hidden = value;
@@ -212,7 +218,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: noAutoAssignIps,
-                      title: const Text('禁止自动分配 IP'),
+                      title: Text(l10n.disableAutoAssignIp),
                       onChanged: (value) {
                         setState(() {
                           noAutoAssignIps = value;
@@ -222,7 +228,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: activeBridge,
-                      title: const Text('活动桥接'),
+                      title: Text(l10n.activeBridge),
                       onChanged: (value) {
                         setState(() {
                           activeBridge = value;
@@ -232,7 +238,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: ssoExempt,
-                      title: const Text('SSO 豁免'),
+                      title: Text(l10n.ssoExempt),
                       onChanged: (value) {
                         setState(() {
                           ssoExempt = value;
@@ -245,11 +251,11 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(dialogContext, true),
-                  child: const Text('保存'),
+                  child: Text(l10n.save),
                 ),
               ],
             );
@@ -269,7 +275,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
     if (apiToken == null || apiToken.isEmpty || networkId == null || networkId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('缺少 API Token 或 Network ID 配置')),
+        SnackBar(content: Text(l10n.missingTokenOrNetwork)),
       );
       return;
     }
@@ -308,46 +314,47 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         _memberFuture = Future<Device>.value(savedDevice);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('成员信息已更新')),
+        SnackBar(content: Text(l10n.updateSuccess)),
       );
     } catch (e) {
       if (!mounted) return;
-      await _showCopyableErrorDialog('更新失败', '$e');
+      await _showCopyableErrorDialog(l10n.updateFailed, '$e');
     }
   }
 
   Future<void> _showDeleteDialog(Device device) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmController = TextEditingController();
     final confirmed = await showDialog<bool>(
           context: context,
           builder: (dialogContext) {
             return AlertDialog(
-              title: const Text('删除成员'),
+              title: Text(l10n.deleteMemberTitle),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('该成员会从当前网络中删除。'),
+                  Text(l10n.deleteMemberWarning),
                   const SizedBox(height: 12),
-                  Text('请输入成员 ID 以确认: ${device.id}'),
+                  Text(l10n.confirmDeleteMember(device.id)),
                   const SizedBox(height: 12),
                   TextField(
                     controller: confirmController,
-                    decoration: const InputDecoration(labelText: '确认成员 ID'),
+                    decoration: InputDecoration(labelText: l10n.confirmMemberId),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(
                     dialogContext,
                     confirmController.text.trim() == device.id,
                   ),
-                  child: const Text('删除成员'),
+                  child: Text(l10n.deleteMember),
                 ),
               ],
             );
@@ -366,7 +373,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
     if (apiToken == null || apiToken.isEmpty || networkId == null || networkId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('缺少 API Token 或 Network ID 配置')),
+        SnackBar(content: Text(l10n.missingTokenOrNetwork)),
       );
       return;
     }
@@ -375,12 +382,12 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       await service.deleteDevice(networkId, device.id, apiToken);
     } catch (e) {
       if (!mounted) return;
-      await _showCopyableErrorDialog('删除失败', '$e');
+      await _showCopyableErrorDialog(l10n.deleteFailed, '$e');
       return;
     }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('成员已删除')),
+      SnackBar(content: Text(l10n.deleteSuccess)),
     );
     Navigator.pop(context, true);
   }
@@ -404,16 +411,17 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: details));
                 if (!mounted) return;
+                final l10n = AppLocalizations.of(context)!;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('错误信息已复制')),
+                  SnackBar(content: Text(l10n.errorCopied)),
                 );
               },
               icon: const Icon(Icons.copy),
-              label: const Text('复制错误'),
+              label: Text(AppLocalizations.of(context)!.copyError),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('关闭'),
+              child: Text(AppLocalizations.of(context)!.close),
             ),
           ],
         );

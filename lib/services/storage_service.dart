@@ -7,6 +7,7 @@ class StorageService with ChangeNotifier {
   static const String _apiTokenKey = 'zerotier_api_token';
   static const String _networkIdKey = 'zerotier_network_id';
   static const String _timeZoneKey = 'zerotier_time_zone';
+  static const String _languageCodeKey = 'zerotier_language_code';
 
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   bool? _secureStorageAvailable;
@@ -14,6 +15,7 @@ class StorageService with ChangeNotifier {
   String? _apiToken;
   String? _networkId;
   String? _timeZone;
+  String? _languageCode;
   
   StorageService();
   
@@ -28,12 +30,14 @@ class StorageService with ChangeNotifier {
       legacyPrefs: prefs,
     );
     _timeZone = prefs.getString(_timeZoneKey);
+    _languageCode = prefs.getString(_languageCodeKey);
     notifyListeners();
   }
   
   String? get apiToken => _apiToken;
   String? get networkId => _networkId;
   String? get timeZone => _timeZone;
+  String? get languageCode => _languageCode;
   
   set apiToken(String? value) {
     _apiToken = value;
@@ -50,6 +54,12 @@ class StorageService with ChangeNotifier {
   set timeZone(String? value) {
     _timeZone = value;
     _saveString(_timeZoneKey, value);
+    notifyListeners();
+  }
+
+  set languageCode(String? value) {
+    _languageCode = value;
+    _saveString(_languageCodeKey, value);
     notifyListeners();
   }
   

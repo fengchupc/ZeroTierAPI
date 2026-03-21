@@ -1,0 +1,221 @@
+{
+  "@@locale": "en",
+  "appTitle": "ZeroTier One Management",
+  "homeTitle": "ZeroTier One Device Status",
+  "stats": "Device Stats",
+  "advancedAdmin": "Advanced Admin",
+  "config": "Configuration",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "notFoundDevices": "No devices found",
+  "loadFailed": "Load failed: {error}",
+  "@loadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "configNeeded": "Please configure API Token and Network ID first",
+  "unnamedDevice": "Unnamed Device",
+  "online": "Online",
+  "offline": "Offline",
+  "ipLabel": "IP: {ip}",
+  "@ipLabel": {
+    "placeholders": {
+      "ip": {}
+    }
+  },
+  "configTitle": "Configuration",
+  "apiToken": "API Token",
+  "apiTokenHint": "Get from ZeroTier One Central",
+  "showToken": "Show Token",
+  "hideToken": "Hide Token",
+  "copyToken": "Copy Token",
+  "tokenCopied": "Token copied to clipboard",
+  "networkId": "Network ID",
+  "networkIdHint": "Example: 0000000000000000",
+  "timeZone": "Time Zone",
+  "timeZoneHint": "Example: Asia/Shanghai, America/New_York",
+  "language": "Language",
+  "saveConfig": "Save Configuration",
+  "configSaved": "Configuration saved",
+  "configHelp": "Configuration Help:",
+  "configHelp1": "1. Log in to ZeroTier One Central (https://my.zerotier.com)",
+  "configHelp2": "2. Find your Network ID on the Networks page",
+  "configHelp3": "3. Generate API Token in Settings > API",
+  "version": "Version: {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "languageChinese": "中文",
+  "languageEnglish": "English",
+  "deviceDetail": "Device Detail",
+  "loadDeviceDetailFailed": "Failed to load device detail: {error}",
+  "@loadDeviceDetailFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "basicInfo": "Basic Info",
+  "memberId": "Member ID",
+  "deviceName": "Device Name",
+  "description": "Description",
+  "status": "Status",
+  "lastOnlineTime": "Last Online Time",
+  "lastOnline": "Last Online",
+  "networkInfo": "Network Info",
+  "ipAddress": "IP Address",
+  "publicIp": "Public IP",
+  "ipAssignments": "IP Assignments",
+  "unassigned": "Unassigned",
+  "authorized": "Authorized",
+  "yes": "Yes",
+  "no": "No",
+  "managementSwitches": "Management Switches",
+  "hiddenMember": "Hidden Member",
+  "disableAutoAssignIp": "Disable Auto IP Assign",
+  "activeBridge": "Active Bridge",
+  "ssoExempt": "SSO Exempt",
+  "technicalInfo": "Technical Info",
+  "nodeId": "Node ID",
+  "deviceId": "Device ID",
+  "clientVersion": "Client Version",
+  "unknown": "Unknown",
+  "memberActions": "Member Actions",
+  "editMember": "Edit Member",
+  "deleteMember": "Delete Member",
+  "missingTokenOrNetwork": "Missing API Token or Network ID configuration",
+  "updateSuccess": "Member updated",
+  "updateFailed": "Update failed",
+  "deleteSuccess": "Member deleted",
+  "deleteFailed": "Delete failed",
+  "copyError": "Copy Error",
+  "errorCopied": "Error copied",
+  "neverOnline": "Never online",
+  "justNowOnline": "Online just now",
+  "minutesAgo": "{count} min ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "hoursAgo": "{count} h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "daysAgo": "{count} d ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cancel": "Cancel",
+  "save": "Save",
+  "close": "Close",
+  "name": "Name",
+  "memberEditTitle": "Edit Member",
+  "ipAssignmentsHint": "Separate multiple IPs with commas",
+  "deleteMemberTitle": "Delete Member",
+  "deleteMemberWarning": "This member will be removed from current network.",
+  "confirmDeleteMember": "Enter member ID to confirm: {id}",
+  "@confirmDeleteMember": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "confirmMemberId": "Confirm Member ID",
+  "adminTitle": "ZeroTier One Management",
+  "adminLoadFailed": "Failed to load admin data: {error}",
+  "@adminLoadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "noAdminData": "No admin data available",
+  "centralStatus": "Central Status",
+  "centralVersion": "Central Version",
+  "apiVersion": "API Version",
+  "readOnlyMode": "Read-only Mode",
+  "currentNetwork": "Current Network",
+  "networkNotConfigured": "Network ID is not configured or inaccessible.",
+  "networkName": "Name",
+  "privateNetwork": "Private Network",
+  "defaultValue": "Default",
+  "broadcast": "Broadcast",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "editNetwork": "Edit Network",
+  "createNetwork": "Create Network",
+  "accessibleNetworks": "Accessible Networks",
+  "noAccessibleNetworks": "No accessible networks for this account",
+  "noDescription": "No description",
+  "current": "Current",
+  "setCurrent": "Set Current",
+  "switchedCurrentNetwork": "Current network switched to {id}",
+  "@switchedCurrentNetwork": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "currentUser": "Current User",
+  "cannotFetchCurrentUser": "Unable to fetch current user",
+  "userId": "User ID",
+  "displayName": "Display Name",
+  "email": "Email",
+  "orgId": "Org ID",
+  "smsNumber": "SMS Number",
+  "none": "None",
+  "unset": "Unset",
+  "editUser": "Edit User",
+  "deleteUser": "Delete User",
+  "apiTokenManagement": "API Token Management",
+  "noVisibleApiToken": "No visible API token records for current user",
+  "deleteToken": "Delete Token",
+  "addApiToken": "Add API Token",
+  "networkNameLabel": "Network Name",
+  "rulesSource": "Rules Source",
+  "allowBroadcast": "Allow Broadcast",
+  "setCurrentAfterCreate": "Set as current after creation",
+  "create": "Create",
+  "networkCreated": "Network created: {id}",
+  "@networkCreated": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "userUpdated": "User updated",
+  "deleteUserTitle": "Delete User",
+  "deleteUserWarning": "This operation deletes the user and associated networks. Cannot undo.",
+  "confirmDeleteUser": "Enter user ID to confirm deletion: {id}",
+  "@confirmDeleteUser": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "confirmUserId": "Confirm User ID",
+  "deleteUserButton": "Delete User",
+  "userDeleted": "User deleted",
+  "tokenName": "Token Name",
+  "tokenValue": "Token Value",
+  "generateRandomToken": "Generate Random Token",
+  "add": "Add",
+  "tokenNameValueRequired": "Token name and token value are both required",
+  "apiTokenAdded": "API Token added",
+  "deleteApiTokenTitle": "Delete API Token",
+  "confirmDeleteToken": "Confirm deleting token: {name}?",
+  "@confirmDeleteToken": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "delete": "Delete",
+  "tokenDeleted": "Token {name} deleted",
+  "@tokenDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  }
+}

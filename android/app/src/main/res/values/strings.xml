@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">zerotierapi</string>
+    <string name="app_name">ZeroTier One Management</string>
     <string name="widget_title_online">在线设备</string>
     <string name="widget_title_offline">离线设备</string>
     <string name="widget_title_all">全部设备</string>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zerotierapi/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:zerotierapi/models/device_model.dart';
 import 'package:zerotierapi/services/device_repository.dart';
@@ -6,7 +7,6 @@ import 'package:zerotierapi/services/storage_service.dart';
 import 'package:zerotierapi/services/widget_sync_service.dart';
 import 'package:zerotierapi/widgets/device_card.dart';
 import 'package:zerotierapi/widgets/refresh_button.dart';
-import 'package:zerotierapi/utils/notifications.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -74,15 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ZeroTier 设备状态'),
+        title: Text(l10n.homeTitle),
         // 在 AppBar 的 actions 中添加
         actions: [
           IconButton(
             icon: const Icon(Icons.bar_chart),
             onPressed: () => Navigator.pushNamed(context, '/stats'),
-            tooltip: '设备统计',
+            tooltip: l10n.stats,
           ),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -91,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.admin_panel_settings),
             onPressed: () => Navigator.pushNamed(context, '/admin'),
-            tooltip: '高级管理',
+            tooltip: l10n.advancedAdmin,
           ),
           RefreshButton(
             onRefresh: _loadDevices,
@@ -103,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
         future: _devicesFuture,
         builder: (context, snapshot) {
           if (_devicesFuture == null) {
-            return const Center(child: Text('请先配置 API Token 和 Network ID'));
+            return Center(child: Text(l10n.configNeeded));
           }
           
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -115,11 +117,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('加载失败: ${snapshot.error}'),
+                  Text(l10n.loadFailed(snapshot.error.toString())),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _loadDevices,
-                    child: const Text('重试'),
+                    child: Text(l10n.retry),
                   ),
                 ],
               ),
@@ -128,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
           
           final devices = snapshot.data ?? [];
           if (devices.isEmpty) {
-            return const Center(child: Text('未找到设备'));
+            return Center(child: Text(l10n.notFoundDevices));
           }
           
           // 按最后在线时间排序

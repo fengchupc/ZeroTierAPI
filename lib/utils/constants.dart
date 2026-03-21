@@ -11,7 +11,7 @@ class Constants {
   static const int apiTimeout = 15;
   
   // 应用名称
-  static const String appName = 'ZeroTier Status';
+  static const String appName = 'ZeroTier One Management';
   
   // 本地数据库名称
   static const String databaseName = 'zerotier.db';
@@ -39,8 +39,8 @@ class Constants {
 
   // 通知频道
   static const String notificationChannelId = 'zerotier_status';
-  static const String notificationChannelName = 'ZeroTier Status Updates';
-  static const String notificationChannelDesc = 'ZeroTier device status notifications';
+  static const String notificationChannelName = 'ZeroTier One Status Updates';
+  static const String notificationChannelDesc = 'ZeroTier One device status notifications';
   
   // 帮助链接
   static const String helpUrl = 'https://docs.zerotier.com';

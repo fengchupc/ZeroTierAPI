@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zerotierapi/l10n/app_localizations.dart';
 import 'package:zerotierapi/models/network_model.dart';
 import 'package:zerotierapi/models/user_model.dart';
 import 'package:zerotierapi/services/storage_service.dart';
@@ -31,9 +32,10 @@ class _AdminScreenState extends State<AdminScreen> {
     final storage = context.read<StorageService>();
     final service = context.read<ZeroTierService>();
     final apiToken = storage.apiToken;
+    final l10n = AppLocalizations.of(context)!;
 
     if (apiToken == null || apiToken.isEmpty) {
-      throw Exception('请先在设置中配置 API Token');
+      throw Exception(l10n.configNeeded);
     }
 
     final status = await service.getStatus(apiToken);
@@ -60,14 +62,16 @@ class _AdminScreenState extends State<AdminScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ZeroTier 管理'),
+        title: Text(l10n.adminTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _reloadData,
-            tooltip: '刷新',
+            tooltip: l10n.refresh,
           ),
         ],
       ),
@@ -85,11 +89,11 @@ class _AdminScreenState extends State<AdminScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('加载管理信息失败: ${snapshot.error}'),
+                    Text(l10n.adminLoadFailed(snapshot.error.toString())),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _reloadData,
-                      child: const Text('重试'),
+                      child: Text(l10n.retry),
                     ),
                   ],
                 ),
@@ -99,7 +103,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
           final data = snapshot.data;
           if (data == null) {
-            return const Center(child: Text('没有可用的管理数据'));
+            return Center(child: Text(l10n.noAdminData));
           }
 
           return ListView(
@@ -124,36 +128,38 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Widget _buildStatusCard(_AdminData data) {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      'Central 状态',
+      l10n.centralStatus,
       [
-        _buildInfoRow('Central 版本', data.status.version ?? '未知'),
-        _buildInfoRow('API 版本', data.status.apiVersion ?? '未知'),
-        _buildInfoRow('只读模式', data.status.readOnlyMode ? '是' : '否'),
+        _buildInfoRow(l10n.centralVersion, data.status.version ?? l10n.unknown),
+        _buildInfoRow(l10n.apiVersion, data.status.apiVersion ?? l10n.unknown),
+        _buildInfoRow(l10n.readOnlyMode, data.status.readOnlyMode ? l10n.yes : l10n.no),
       ],
     );
   }
 
   Widget _buildCurrentNetworkCard(_AdminData data) {
+    final l10n = AppLocalizations.of(context)!;
     final network = data.currentNetwork;
     return _buildSectionCard(
-      '当前网络',
+      l10n.currentNetwork,
       [
         if (network == null)
-          const Text('当前未配置 Network ID，或该网络无法访问。')
+          Text(l10n.networkNotConfigured)
         else ...[
-          _buildInfoRow('网络 ID', network.id),
-          _buildInfoRow('名称', network.name ?? '未命名'),
-          _buildInfoRow('描述', network.description ?? '未设置'),
-          _buildInfoRow('私有网络', network.isPrivate == true ? '是' : '否'),
-          _buildInfoRow('MTU', network.mtu?.toString() ?? '默认'),
+          _buildInfoRow(l10n.networkId, network.id),
+          _buildInfoRow(l10n.networkName, network.name ?? l10n.unnamedDevice),
+          _buildInfoRow(l10n.description, network.description ?? l10n.unset),
+          _buildInfoRow(l10n.privateNetwork, network.isPrivate == true ? l10n.yes : l10n.no),
+          _buildInfoRow('MTU', network.mtu?.toString() ?? l10n.defaultValue),
           _buildInfoRow(
-            '广播',
-            network.enableBroadcast == true ? '已启用' : '未启用',
+            l10n.broadcast,
+            network.enableBroadcast == true ? l10n.enabled : l10n.disabled,
           ),
           _buildInfoRow(
             'Multicast Limit',
-            network.multicastLimit?.toString() ?? '默认',
+            network.multicastLimit?.toString() ?? l10n.defaultValue,
           ),
           const SizedBox(height: 12),
           Wrap(
@@ -163,12 +169,12 @@ class _AdminScreenState extends State<AdminScreen> {
               ElevatedButton.icon(
                 onPressed: () => _showNetworkEditDialog(network),
                 icon: const Icon(Icons.edit),
-                label: const Text('编辑网络'),
+                label: Text(l10n.editNetwork),
               ),
               OutlinedButton.icon(
                 onPressed: _showCreateNetworkDialog,
                 icon: const Icon(Icons.add_circle_outline),
-                label: const Text('新建网络'),
+                label: Text(l10n.createNetwork),
               ),
             ],
           ),
@@ -178,14 +184,15 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Widget _buildNetworkListCard(_AdminData data) {
+    final l10n = AppLocalizations.of(context)!;
     final storage = context.watch<StorageService>();
     final currentNetworkId = storage.networkId;
 
     return _buildSectionCard(
-      '可访问网络',
+      l10n.accessibleNetworks,
       [
         if (data.networks.isEmpty)
-          const Text('当前账号下没有可访问网络')
+          Text(l10n.noAccessibleNetworks)
         else
           ...data.networks.map((network) {
             final isCurrent = network.id == currentNetworkId;
@@ -197,18 +204,18 @@ class _AdminScreenState extends State<AdminScreen> {
                   vertical: 4,
                 ),
                 title: Text(network.name ?? network.id),
-                subtitle: Text(network.description ?? '无描述'),
+                subtitle: Text(network.description ?? l10n.noDescription),
                 trailing: isCurrent
-                    ? const Chip(label: Text('当前'))
+                    ? Chip(label: Text(l10n.current))
                     : TextButton(
                         onPressed: () {
                           storage.networkId = network.id;
                           _reloadData();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('当前网络已切换为 ${network.id}')),
+                            SnackBar(content: Text(l10n.switchedCurrentNetwork(network.id))),
                           );
                         },
-                        child: const Text('设为当前'),
+                        child: Text(l10n.setCurrent),
                       ),
               ),
             );
@@ -218,18 +225,19 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Widget _buildUserCard(_AdminData data) {
+    final l10n = AppLocalizations.of(context)!;
     final user = data.user;
     return _buildSectionCard(
-      '当前用户',
+      l10n.currentUser,
       [
         if (user == null)
-          const Text('无法获取当前用户信息')
+          Text(l10n.cannotFetchCurrentUser)
         else ...[
-          _buildInfoRow('用户 ID', user.id),
-          _buildInfoRow('显示名称', user.displayName ?? '未设置'),
-          _buildInfoRow('邮箱', user.email ?? '未知'),
-          _buildInfoRow('组织 ID', user.orgId ?? '无'),
-          _buildInfoRow('短信号码', user.smsNumber ?? '未设置'),
+          _buildInfoRow(l10n.userId, user.id),
+          _buildInfoRow(l10n.displayName, user.displayName ?? l10n.unset),
+          _buildInfoRow(l10n.email, user.email ?? l10n.unknown),
+          _buildInfoRow(l10n.orgId, user.orgId ?? l10n.none),
+          _buildInfoRow(l10n.smsNumber, user.smsNumber ?? l10n.unset),
           const SizedBox(height: 12),
           Wrap(
             spacing: 12,
@@ -238,12 +246,12 @@ class _AdminScreenState extends State<AdminScreen> {
               ElevatedButton.icon(
                 onPressed: () => _showUserEditDialog(user),
                 icon: const Icon(Icons.edit),
-                label: const Text('编辑用户'),
+                label: Text(l10n.editUser),
               ),
               OutlinedButton.icon(
                 onPressed: () => _showDeleteUserDialog(user),
                 icon: const Icon(Icons.delete_forever),
-                label: const Text('删除用户'),
+                label: Text(l10n.deleteUser),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.error,
                 ),
@@ -256,11 +264,12 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Widget _buildTokenCard(ZeroTierUser user) {
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
-      'API Token 管理',
+      l10n.apiTokenManagement,
       [
         if (user.tokens.isEmpty)
-          const Text('当前用户还没有可见的 API Token 记录')
+          Text(l10n.noVisibleApiToken)
         else
           ...user.tokens.map((tokenName) {
             return Card(
@@ -269,7 +278,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 title: Text(tokenName),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  tooltip: '删除 Token',
+                  tooltip: l10n.deleteToken,
                   onPressed: () => _deleteToken(user, tokenName),
                 ),
               ),
@@ -279,7 +288,7 @@ class _AdminScreenState extends State<AdminScreen> {
         OutlinedButton.icon(
           onPressed: () => _showAddTokenDialog(user),
           icon: const Icon(Icons.key_outlined),
-          label: const Text('添加 API Token'),
+          label: Text(l10n.addApiToken),
         ),
       ],
     );
@@ -332,6 +341,7 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Future<void> _showNetworkEditDialog(ZeroTierNetwork network) async {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: network.name ?? '');
     final descriptionController = TextEditingController(
       text: network.description ?? '',
@@ -354,25 +364,25 @@ class _AdminScreenState extends State<AdminScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('编辑网络'),
+              title: Text(l10n.editNetwork),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: '网络名称'),
+                      decoration: InputDecoration(labelText: l10n.networkNameLabel),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: descriptionController,
-                      decoration: const InputDecoration(labelText: '描述'),
+                      decoration: InputDecoration(labelText: l10n.description),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: rulesController,
-                      decoration: const InputDecoration(labelText: 'Rules Source'),
+                      decoration: InputDecoration(labelText: l10n.rulesSource),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 12),
@@ -392,7 +402,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: privateNetwork,
-                      title: const Text('私有网络'),
+                      title: Text(l10n.privateNetwork),
                       onChanged: (value) {
                         setState(() {
                           privateNetwork = value;
@@ -402,7 +412,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: enableBroadcast,
-                      title: const Text('允许广播'),
+                      title: Text(l10n.allowBroadcast),
                       onChanged: (value) {
                         setState(() {
                           enableBroadcast = value;
@@ -415,11 +425,11 @@ class _AdminScreenState extends State<AdminScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(dialogContext, true),
-                  child: const Text('保存'),
+                  child: Text(l10n.save),
                 ),
               ],
             );
@@ -457,12 +467,13 @@ class _AdminScreenState extends State<AdminScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('网络配置已更新')),
+      SnackBar(content: Text(l10n.updateSuccess)),
     );
     _reloadData();
   }
 
   Future<void> _showCreateNetworkDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
     var privateNetwork = true;
@@ -474,25 +485,25 @@ class _AdminScreenState extends State<AdminScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('新建网络'),
+              title: Text(l10n.createNetwork),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: '网络名称'),
+                      decoration: InputDecoration(labelText: l10n.networkNameLabel),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: descriptionController,
-                      decoration: const InputDecoration(labelText: '描述'),
+                      decoration: InputDecoration(labelText: l10n.description),
                       maxLines: 2,
                     ),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: privateNetwork,
-                      title: const Text('私有网络'),
+                      title: Text(l10n.privateNetwork),
                       onChanged: (value) {
                         setState(() {
                           privateNetwork = value;
@@ -502,7 +513,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: useAsCurrent,
-                      title: const Text('创建后设为当前网络'),
+                      title: Text(l10n.setCurrentAfterCreate),
                       onChanged: (value) {
                         setState(() {
                           useAsCurrent = value;
@@ -515,11 +526,11 @@ class _AdminScreenState extends State<AdminScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(dialogContext, true),
-                  child: const Text('创建'),
+                  child: Text(l10n.create),
                 ),
               ],
             );
@@ -554,12 +565,13 @@ class _AdminScreenState extends State<AdminScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('网络已创建: ${network.id}')),
+      SnackBar(content: Text(l10n.networkCreated(network.id))),
     );
     _reloadData();
   }
 
   Future<void> _showUserEditDialog(ZeroTierUser user) async {
+    final l10n = AppLocalizations.of(context)!;
     final displayNameController = TextEditingController(
       text: user.displayName ?? '',
     );
@@ -569,29 +581,29 @@ class _AdminScreenState extends State<AdminScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('编辑用户'),
+          title: Text(l10n.editUser),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: displayNameController,
-                decoration: const InputDecoration(labelText: '显示名称'),
+                decoration: InputDecoration(labelText: l10n.displayName),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: smsController,
-                decoration: const InputDecoration(labelText: '短信号码'),
+                decoration: InputDecoration(labelText: l10n.smsNumber),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('取消'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('保存'),
+              child: Text(l10n.save),
             ),
           ],
         );
@@ -624,37 +636,38 @@ class _AdminScreenState extends State<AdminScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('用户信息已更新')),
+      SnackBar(content: Text(l10n.userUpdated)),
     );
     _reloadData();
   }
 
   Future<void> _showDeleteUserDialog(ZeroTierUser user) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmController = TextEditingController();
 
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('删除用户'),
+          title: Text(l10n.deleteUserTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('该操作会删除用户及其关联网络，无法撤销。'),
+              Text(l10n.deleteUserWarning),
               const SizedBox(height: 12),
-              Text('请输入用户 ID 以确认删除: ${user.id}'),
+              Text(l10n.confirmDeleteUser(user.id)),
               const SizedBox(height: 12),
               TextField(
                 controller: confirmController,
-                decoration: const InputDecoration(labelText: '确认用户 ID'),
+                decoration: InputDecoration(labelText: l10n.confirmUserId),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('取消'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(
@@ -664,7 +677,7 @@ class _AdminScreenState extends State<AdminScreen> {
               style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
-              child: const Text('删除用户'),
+              child: Text(l10n.deleteUserButton),
             ),
           ],
         );
@@ -690,12 +703,13 @@ class _AdminScreenState extends State<AdminScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('用户已删除')),
+      SnackBar(content: Text(l10n.userDeleted)),
     );
     Navigator.pop(context, true);
   }
 
   Future<void> _showAddTokenDialog(ZeroTierUser user) async {
+    final l10n = AppLocalizations.of(context)!;
     final tokenNameController = TextEditingController();
     final tokenController = TextEditingController();
 
@@ -705,19 +719,19 @@ class _AdminScreenState extends State<AdminScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('添加 API Token'),
+              title: Text(l10n.addApiToken),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: tokenNameController,
-                      decoration: const InputDecoration(labelText: 'Token 名称'),
+                      decoration: InputDecoration(labelText: l10n.tokenName),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: tokenController,
-                      decoration: const InputDecoration(labelText: 'Token 值'),
+                      decoration: InputDecoration(labelText: l10n.tokenValue),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 8),
@@ -737,7 +751,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           });
                         },
                         icon: const Icon(Icons.casino_outlined),
-                        label: const Text('生成随机 Token'),
+                        label: Text(l10n.generateRandomToken),
                       ),
                     ),
                   ],
@@ -746,11 +760,11 @@ class _AdminScreenState extends State<AdminScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(dialogContext, true),
-                  child: const Text('添加'),
+                  child: Text(l10n.add),
                 ),
               ],
             );
@@ -774,7 +788,7 @@ class _AdminScreenState extends State<AdminScreen> {
     final token = tokenController.text.trim();
     if (tokenName.isEmpty || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token 名称和 Token 值都不能为空')),
+        SnackBar(content: Text(l10n.tokenNameValueRequired)),
       );
       return;
     }
@@ -784,26 +798,27 @@ class _AdminScreenState extends State<AdminScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('API Token 已添加')),
+      SnackBar(content: Text(l10n.apiTokenAdded)),
     );
     _reloadData();
   }
 
   Future<void> _deleteToken(ZeroTierUser user, String tokenName) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
           context: context,
           builder: (dialogContext) {
             return AlertDialog(
-              title: const Text('删除 API Token'),
-              content: Text('确认删除 Token: $tokenName ?'),
+              title: Text(l10n.deleteApiTokenTitle),
+              content: Text(l10n.confirmDeleteToken(tokenName)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(dialogContext, true),
-                  child: const Text('删除'),
+                  child: Text(l10n.delete),
                 ),
               ],
             );
@@ -827,7 +842,7 @@ class _AdminScreenState extends State<AdminScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Token $tokenName 已删除')),
+      SnackBar(content: Text(l10n.tokenDeleted(tokenName))),
     );
     _reloadData();
   }
