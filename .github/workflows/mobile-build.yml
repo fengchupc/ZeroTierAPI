@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,7 +30,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload Android artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: zerotierapi-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -81,7 +81,7 @@ jobs:
           ! unzip -l build/ios/ipa/zerotierapi-ios-unsigned-no-widget.ipa | grep -E 'Payload/.+\.app/PlugIns/.+\.appex/'
 
       - name: Upload iOS artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: zerotierapi-ios-unsigned-no-widget-ipa
           path: build/ios/ipa/zerotierapi-ios-unsigned-no-widget.ipa
