@@ -65,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _widgetSyncService.syncDevices(devices);
         if (!mounted) return;
         setState(() => _isRefreshing = false);
-        showUpdateNotification(context, '设备列表已更新');
       }).catchError((_) {
         if (!mounted) return;
         setState(() => _isRefreshing = false);
