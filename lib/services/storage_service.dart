@@ -9,7 +9,9 @@ class StorageService with ChangeNotifier {
   static const String _timeZoneKey = 'zerotier_time_zone';
   static const String _languageCodeKey = 'zerotier_language_code';
 
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage(
+    mOptions: MacOsOptions(useDataProtectionKeychain: true),
+  );
   bool? _secureStorageAvailable;
   
   String? _apiToken;
