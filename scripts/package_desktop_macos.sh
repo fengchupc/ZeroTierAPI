@@ -22,7 +22,7 @@ flutter pub get
 echo "[2/3] 构建 macOS release..."
 flutter build macos
 
-APP_DIR="build/macos/Build/Products/Release/zerotierapi.app"
+APP_DIR="build/macos/Build/Products/Release/ZeroTier One Management.app"
 if [[ ! -d "$APP_DIR" ]]; then
   echo "[ERROR] 找不到 .app 目录，构建可能失败。"
   exit 1
