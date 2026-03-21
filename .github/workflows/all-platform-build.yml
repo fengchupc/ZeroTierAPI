@@ -1,0 +1,163 @@
+name: Build All Platforms
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'release*'
+      - 'release/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: build-${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: android
+            os: ubuntu-latest
+            artifact_name: zerotierapi-android-apk
+            artifact_path: build/app/outputs/flutter-apk/app-release.apk
+
+          - target: ios
+            os: macos-latest
+            artifact_name: zerotierapi-ios-unsigned-no-widget-ipa
+            artifact_path: build/ios/ipa/zerotierapi-ios-unsigned-no-widget.ipa
+
+          - target: linux
+            os: ubuntu-latest
+            artifact_name: zerotierapi-linux
+            artifact_path: dist/zerotierapi-linux-*.tar.gz
+
+          - target: windows
+            os: windows-latest
+            artifact_name: zerotierapi-windows
+            artifact_path: dist/zerotierapi-windows-*.zip
+
+          - target: macos
+            os: macos-latest
+            artifact_name: zerotierapi-macos
+            artifact_path: dist/zerotierapi-macos.zip
+
+          - target: web
+            os: ubuntu-latest
+            artifact_name: zerotierapi-web
+            artifact_path: dist/zerotierapi-web.zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install Linux dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libgtk-3-dev \
+            libsecret-1-dev
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Android APK (release)
+        if: matrix.target == 'android'
+        run: flutter build apk --release
+
+      - name: Build iOS app (release, no codesign)
+        if: matrix.target == 'ios'
+        run: flutter build ios --release --no-codesign
+
+      - name: Archive iOS app without signing
+        if: matrix.target == 'ios'
+        run: |
+          xcodebuild archive \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package unsigned iOS IPA from archive (no widget)
+        if: matrix.target == 'ios'
+        run: |
+          mkdir -p build/ios/ipa/Payload
+          cp -R build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/ipa/Payload/
+          rm -rf build/ios/ipa/Payload/Runner.app/PlugIns
+          cd build/ios/ipa
+          zip -r zerotierapi-ios-unsigned-no-widget.ipa Payload
+
+      - name: Verify no app extensions in IPA
+        if: matrix.target == 'ios'
+        run: |
+          ! unzip -l build/ios/ipa/zerotierapi-ios-unsigned-no-widget.ipa | grep -E 'Payload/.+\.app/PlugIns/.+\.appex/'
+
+      - name: Build Linux package
+        if: matrix.target == 'linux'
+        run: bash ./scripts/package_desktop.sh
+
+      - name: Build macOS package
+        if: matrix.target == 'macos'
+        run: bash ./scripts/package_desktop_macos.sh
+
+      - name: Build Windows package
+        if: matrix.target == 'windows'
+        shell: cmd
+        run: scripts\package_desktop.bat
+
+      - name: Build Web
+        if: matrix.target == 'web'
+        run: |
+          flutter build web --release
+          mkdir -p dist
+          cd build/web
+          zip -r ../../dist/zerotierapi-web.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
+
+  release:
+    name: create-release
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            release-assets/*.apk
+            release-assets/*.ipa
+            release-assets/*.zip
+            release-assets/*.tar.gz

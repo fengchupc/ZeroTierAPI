@@ -12,16 +12,32 @@ Future<void> initNotifications() async {
 
   const DarwinInitializationSettings initializationSettingsDarwin =
       DarwinInitializationSettings();
+
+  const LinuxInitializationSettings initializationSettingsLinux =
+      LinuxInitializationSettings(defaultActionName: '打开通知');
+
+  const WindowsInitializationSettings initializationSettingsWindows =
+      WindowsInitializationSettings(
+        appName: 'ZeroTierAPI',
+        appUserModelId: 'com.example.zerotierapi',
+        guid: '8f7de4dd-f7c7-4ac8-b598-9b9f6ca85ca8',
+      );
   
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
     iOS: initializationSettingsDarwin,
     macOS: initializationSettingsDarwin,
+    linux: initializationSettingsLinux,
+    windows: initializationSettingsWindows,
   );
-  
-  await notificationsPlugin.initialize(
-    settings: initializationSettings,
-  );
+
+  try {
+    await notificationsPlugin.initialize(
+      settings: initializationSettings,
+    );
+  } catch (_) {
+    return;
+  }
 }
 
 Future<void> ensureNotificationsInitialized() {

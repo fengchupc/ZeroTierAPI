@@ -45,15 +45,11 @@ Future<shelf.Response> _handleRequest(shelf.Request request) async {
       ? request.url.path.substring(4) 
       : request.url.path;
 
-  if (!path.startsWith('devices/')) {
+  if (path.isEmpty) {
     developer.log('路径不匹配: $path', name: 'proxy_server');
     return shelf.Response.notFound('Not Found');
   }
-
-  final networkId = path.substring('devices/'.length);
   final authHeader = request.headers['authorization'];
-
-  developer.log('处理请求: networkId=$networkId', name: 'proxy_server');
 
   if (authHeader == null) {
     developer.log('未提供认证令牌', name: 'proxy_server');
@@ -61,16 +57,49 @@ Future<shelf.Response> _handleRequest(shelf.Request request) async {
   }
 
   try {
-    final apiUrl = 'https://api.zerotier.com/api/v1/network/$networkId/member';
+    final query = request.url.hasQuery ? '?${request.url.query}' : '';
+    final apiUrl = 'https://api.zerotier.com/api/v1/$path$query';
     developer.log('请求 ZeroTier API: $apiUrl', name: 'proxy_server');
 
-    final response = await http.get(
-      Uri.parse(apiUrl),
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json',
-      },
-    );
+    final requestBody = await request.readAsString();
+
+    late http.Response response;
+    switch (request.method.toUpperCase()) {
+      case 'POST':
+        response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: requestBody,
+        );
+        break;
+      case 'DELETE':
+        response = await http.delete(
+          Uri.parse(apiUrl),
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+        );
+        break;
+      case 'GET':
+        response = await http.get(
+          Uri.parse(apiUrl),
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+        );
+        break;
+      default:
+        return shelf.Response(
+          HttpStatus.methodNotAllowed,
+          body: json.encode({'error': 'Unsupported method: ${request.method}'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+    }
 
     developer.log('ZeroTier API 响应状态码: ${response.statusCode}', name: 'proxy_server');
 

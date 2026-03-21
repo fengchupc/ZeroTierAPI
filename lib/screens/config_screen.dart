@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:zerotierapi/services/storage_service.dart';
 
@@ -14,6 +15,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
   late TextEditingController _apiTokenController;
   late TextEditingController _networkIdController;
   late TextEditingController _timeZoneController;
+  bool _obscureToken = true;
 
   @override
   void initState() {
@@ -37,10 +39,18 @@ class _ConfigScreenState extends State<ConfigScreen> {
             children: [
               TextFormField(
                 controller: _apiTokenController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'API Token',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   hintText: '从 ZeroTier 控制台获取',
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureToken
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    tooltip: _obscureToken ? '显示 Token' : '隐藏 Token',
+                    onPressed: () =>
+                        setState(() => _obscureToken = !_obscureToken),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -48,7 +58,21 @@ class _ConfigScreenState extends State<ConfigScreen> {
                   }
                   return null;
                 },
-                obscureText: true,
+                obscureText: _obscureToken,
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.copy, size: 16),
+                label: const Text('复制 Token'),
+                onPressed: () {
+                  final token = _apiTokenController.text;
+                  if (token.isNotEmpty) {
+                    Clipboard.setData(ClipboardData(text: token));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Token 已复制到剪贴板')),
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -101,9 +125,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
   void _saveConfig() {
     if (_formKey.currentState!.validate()) {
       final storage = context.read<StorageService>();
-      storage.apiToken = _apiTokenController.text;
-      storage.networkId = _networkIdController.text;
-      storage.timeZone = _timeZoneController.text;
+      storage.apiToken = _apiTokenController.text.trim();
+      storage.networkId = _networkIdController.text.trim();
+      storage.timeZone = _timeZoneController.text.trim();
       
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('配置已保存')),

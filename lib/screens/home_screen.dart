@@ -89,6 +89,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.pushNamed(context, '/config'),
           ),
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            onPressed: () => Navigator.pushNamed(context, '/admin'),
+            tooltip: '高级管理',
+          ),
           RefreshButton(
             onRefresh: _loadDevices,
             isRefreshing: _isRefreshing,
@@ -134,7 +139,21 @@ class _HomeScreenState extends State<HomeScreen> {
           return ListView.builder(
             itemCount: devices.length,
             itemBuilder: (context, index) {
-              return DeviceCard(device: devices[index]);
+              final device = devices[index];
+              return DeviceCard(
+                device: device,
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/device',
+                    arguments: device,
+                  ).then((value) {
+                    if (value == true && mounted) {
+                      _loadDevices();
+                    }
+                  });
+                },
+              );
             },
           );
         },

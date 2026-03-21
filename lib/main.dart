@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart'
 import 'package:zerotierapi/services/web_storage_service.dart';
 import 'package:zerotierapi/services/device_repository.dart';
 import 'package:zerotierapi/screens/device_stats_screen.dart'; // 添加这一行导入语句
+import 'package:zerotierapi/screens/admin_screen.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:zerotierapi/utils/notifications.dart';
 
@@ -90,6 +91,7 @@ class MyApp extends StatelessWidget {
           return DeviceDetailScreen(device: device);
         },
         '/stats': (context) => const DeviceStatsScreen(), // 新增
+        '/admin': (context) => const AdminScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

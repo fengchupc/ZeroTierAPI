@@ -5,8 +5,9 @@ import 'package:zerotierapi/widgets/status_indicator.dart';
 
 class DeviceCard extends StatelessWidget {
   final Device device;
+  final VoidCallback? onTap;
   
-  const DeviceCard({super.key, required this.device});
+  const DeviceCard({super.key, required this.device, this.onTap});
   
   @override
   Widget build(BuildContext context) {
@@ -61,13 +62,7 @@ class DeviceCard extends StatelessWidget {
           ],
         ),
         // 在设备卡片的 onTap 中添加导航
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/device',
-            arguments: device,
-          );
-        },
+        onTap: onTap,
       ),
     );
   }
