@@ -83,7 +83,7 @@ jobs:
           merge-multiple: true
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: desktop-build-${{ github.run_number }}-${{ github.run_attempt }}
           name: Release for Desktop Build #${{ github.run_number }}.${{ github.run_attempt }}
